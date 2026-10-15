@@ -1,0 +1,16 @@
+ESTUDO DA VERSÃO PÚBLICA — BRAZILIANBOOTY
+Origem: https://metodomujerfit.netlify.app/
+Data: 15/10/2026
+
+Esta pasta contém arquivos públicos compilados do site, não o projeto-fonte de desenvolvimento nem a área paga.
+Para abrir corretamente, sirva esta pasta na raiz de um servidor HTTP. Não abra index.html por duplo clique: o navegador pode bloquear módulos JavaScript.
+Exemplo: python -m http.server 8000
+Depois acesse http://localhost:8000
+
+Vídeo, rastreamento, fontes e pagamento podem depender de serviços externos. Os links de pagamento originais não foram substituídos.
+Não é possível garantir disponibilidade ou autorização de reprodução de serviços externos e conteúdos pagos.
+
+Validação: carregamento inicial, apresentação, navegação pelas perguntas e entrada de medidas testados localmente. Imagens externas copiadas para images; bundle original preservado em original.
+Atenção: /upsell.html retornou 404 no site original durante a captura. O vídeo usa Vturb/ConverteAI e permanece dependente do serviço externo; não foi baixada a mídia de streaming nem conteúdo pago.
+Checkout da página principal no bundle: https://pay.hotmart.com/H107750866F?checkoutMode=10
+Checkout observado dentro do vídeo: PerfectPay, produto Desincha já, divergente da oferta.
