@@ -5,153 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="google" content="notranslate" />
-    <meta name="quiz-build" content="static-hotmart-vturb-hidden-20261009-1" />
+    <meta name="quiz-build" content="static-native-gluteos-20261015-1" />
     <title>Video — Desafío Glúteos Brasileños</title>
-    <link rel="preconnect" href="https://scripts.converteai.net" crossorigin />
-    <link rel="preconnect" href="https://cdn.converteai.net" crossorigin />
-    <link rel="preconnect" href="https://images.converteai.net" crossorigin />
+    <link rel="preconnect" href="https://gluteosbrasilenos.lat" />
     <style>
-      * {
-        box-sizing: border-box;
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 100%; height: 100%; background: #000; }
+      body { overflow: hidden; }
+      video { display: block; width: 100%; height: 100%; object-fit: contain; }
+      #video-error {
+        position: absolute; right: 16px; bottom: 48px; left: 16px;
+        margin: 0; padding: 12px; color: #fff; background: rgba(0, 0, 0, .85);
+        font: 14px/1.5 sans-serif; text-align: center;
       }
-      html,
-      body {
-        margin: 0;
-        width: 100%;
-        min-height: 100%;
-        background: #000;
-      }
-      body {
-        overflow: hidden;
-      }
-      vturb-smartplayer {
-        display: block;
-        margin: 0 auto;
-        width: 100%;
-        max-width: 400px;
-      }
-      noscript {
-        display: block;
-        color: white;
-        padding: 20px;
-        font-family: sans-serif;
-      }
+      #video-error a { color: #fff; }
+      noscript { color: #fff; padding: 20px; font-family: sans-serif; }
     </style>
   </head>
   <body>
-    <vturb-smartplayer
+    <video
       id="vid-6aa9ec0b2867174ee33fcba6"
-      style="display: block; margin: 0 auto; width: 100%; max-width: 400px"
+      src="https://gluteosbrasilenos.lat/vsl-video.mp4"
+      controls
+      playsinline
+      preload="metadata"
+      aria-label="Presentación de entrenamiento — Desafío Glúteos Brasileños"
     >
-      <div
-        class="vturb-player-placeholder"
-        style="
-          position: relative;
-          width: 100%;
-          padding: 125% 0 0;
-          z-index: 0;
-          background-color: black;
-        "
-      ></div>
-    </vturb-smartplayer>
-    <!-- Alvo da opção Mostrar conteúdo oculto no painel Vturb.
-         A sentinela permanece fora da tela; o cartão real está na página pai. -->
+      Tu navegador no permite reproducir este video.
+      <a href="https://gluteosbrasilenos.lat/vsl-video.mp4" target="_blank" rel="noopener">Abrir el video</a>
+    </video>
+    <!-- Contrato con la página del cuestionario: se muestra al terminar el video. -->
     <div
       id="liberar-plano-vsl"
       class="liberar-plano-vsl"
       aria-hidden="true"
       style="display: none; position: absolute; left: -10000px; top: 0; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none"
     ></div>
-    <noscript>Activa JavaScript para reproducir el video.</noscript>
+    <p id="video-error" hidden>
+      No se pudo cargar el video.
+      <a href="https://gluteosbrasilenos.lat/vsl-video.mp4" target="_blank" rel="noopener">Abrir el video directamente</a>.
+    </p>
+    <noscript>Activa JavaScript para continuar al finalizar el video.</noscript>
     <script>
       (function () {
         "use strict";
+        // Identificador conservado para la integración con el cuestionario.
         var playerId = "vid-6aa9ec0b2867174ee33fcba6";
+        var video = document.getElementById(playerId);
+        var gate = document.getElementById("liberar-plano-vsl");
+        var errorMessage = document.getElementById("video-error");
+        var played = false;
+        var revealed = false;
+        var milestones = new Set();
+
         function notify(type, extra) {
           if (window.parent === window) return;
           window.parent.postMessage(
             Object.assign({ source: "quiz-vturb-v1", playerId: playerId, type: type }, extra || {}),
-            window.location.origin,
+            window.location.origin
           );
         }
-        // Conecta a revelação feita pela Vturb ao React sem modificar seu DOM.
-        var gate = document.getElementById("liberar-plano-vsl");
-        var gateRevealed = false;
-        function observeGate() {
-          if (!gate || gateRevealed) return;
-          if (window.getComputedStyle(gate).display !== "none") {
-            gateRevealed = true;
-            notify("content-revealed", { gate: "liberar-plano-vsl" });
-          }
-        }
-        var gateObserver = new MutationObserver(observeGate);
-        function startGateObservation() {
-          gateObserver.disconnect();
-          if (gate) gateObserver.observe(gate, { attributes: true, attributeFilter: ["style", "class", "hidden"] });
-          observeGate();
-        }
-        startGateObservation();
 
-        // Código de incorporação oficial; executado uma vez por documento.
-        var script = document.createElement("script");
-        script.src =
-          "https://scripts.converteai.net/2c020fec-8a67-4db3-b123-26c255f32c5b/players/6aa9ec0b2867174ee33fcba6/v4/player.js";
-        script.async = true;
-        script.onerror = function () {
+        function ready() {
+          errorMessage.hidden = true;
+          notify("ready");
+        }
+
+        function reportProgress() {
+          var time = Number(video.currentTime);
+          var duration = Number(video.duration);
+          if (!Number.isFinite(time) || !Number.isFinite(duration) || duration <= 0) return;
+          [25, 50, 75, 90, 100].forEach(function (percent) {
+            if ((time / duration) * 100 >= percent && !milestones.has(percent)) {
+              milestones.add(percent);
+              notify("milestone", { percent: percent });
+            }
+          });
+        }
+
+        function revealPlan() {
+          if (revealed) return;
+          revealed = true;
+          gate.style.display = "block";
+          notify("content-revealed", { gate: "liberar-plano-vsl" });
+        }
+
+        video.addEventListener("loadedmetadata", ready);
+        video.addEventListener("canplay", ready);
+        video.addEventListener("play", function () {
+          if (played) return;
+          played = true;
+          notify("play");
+        });
+        video.addEventListener("timeupdate", function () {
+          if (!video.seeking && !video.paused) reportProgress();
+        });
+        video.addEventListener("ended", function () {
+          reportProgress();
+          revealPlan();
+        });
+        video.addEventListener("error", function () {
+          errorMessage.hidden = false;
           notify("error");
-        };
-        document.head.appendChild(script);
-
-        // API v4 no próprio custom element. Não consulta window.smartplayer.
-        // A observação nunca altera reprodução, qualidade, volume ou tempo.
-        var ready = false;
-        var played = false;
-        var milestones = new Set();
-        var lastTime = 0;
-        var interval;
-        function observePlayer() {
-          observeGate();
-          try {
-            var player = document.getElementById(playerId);
-            if (!player) return;
-            var time = Number(player.currentTime);
-            var duration = Number(player.duration);
-            if (!Number.isFinite(time) || !Number.isFinite(duration) || duration <= 0) return;
-            if (!ready && time > lastTime) {
-              ready = true;
-              notify("ready");
-            }
-            if (!player.paused && !player.inSmartAutoPlay && !player.inResume && time > lastTime) {
-              if (!played) {
-                played = true;
-                notify("play");
-              }
-              [25, 50, 75, 90, 100].forEach(function (percent) {
-                if ((time / duration) * 100 >= percent && !milestones.has(percent)) {
-                  milestones.add(percent);
-                  notify("milestone", { percent: percent });
-                }
-              });
-            }
-            lastTime = time;
-          } catch (_) {
-            // Uma API ainda não inicializada não pode interromper a página.
-          }
-        }
-        function startObservation() {
-          window.clearInterval(interval);
-          interval = window.setInterval(observePlayer, 500);
-        }
-        startObservation();
-        // Safari/Chrome podem restaurar o documento inteiro do back-forward cache.
+        });
         window.addEventListener("pageshow", function () {
-          startGateObservation();
-          startObservation();
+          if (video.readyState >= 1) ready();
+          if (video.ended) revealPlan();
         });
-        window.addEventListener("pagehide", function () {
-          window.clearInterval(interval);
-          gateObserver.disconnect();
-        });
+        if (video.readyState >= 1) ready();
       })();
     </script>
   </body>
