@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="google" content="notranslate" />
-    <meta name="quiz-build" content="static-native-gluteos-20261015-1" />
+    <meta name="quiz-build" content="static-native-gluteos-autoplay-audio-20261015-2" />
     <title>Video — Desafío Glúteos Brasileños</title>
     <link rel="preconnect" href="https://gluteosbrasilenos.lat" />
     <style>
@@ -19,6 +19,12 @@
         font: 14px/1.5 sans-serif; text-align: center;
       }
       #video-error a { color: #fff; }
+      #play-video {
+        position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+        max-width: calc(100% - 32px); padding: 12px 18px; border: 2px solid #fff;
+        border-radius: 12px; background: #000d; color: #fff; cursor: pointer;
+        font: bold 16px/1.3 sans-serif; z-index: 1;
+      }
       noscript { color: #fff; padding: 20px; font-family: sans-serif; }
     </style>
   </head>
@@ -27,13 +33,15 @@
       id="vid-6aa9ec0b2867174ee33fcba6"
       src="https://gluteosbrasilenos.lat/vsl-video.mp4"
       controls
+      autoplay
       playsinline
-      preload="metadata"
+      preload="auto"
       aria-label="Presentación de entrenamiento — Desafío Glúteos Brasileños"
     >
       Tu navegador no permite reproducir este video.
       <a href="https://gluteosbrasilenos.lat/vsl-video.mp4" target="_blank" rel="noopener">Abrir el video</a>
     </video>
+    <button id="play-video" type="button" hidden>▶ Reproducir con sonido</button>
     <!-- Contrato con la página del cuestionario: se muestra al terminar el video. -->
     <div
       id="liberar-plano-vsl"
@@ -54,6 +62,7 @@
         var video = document.getElementById(playerId);
         var gate = document.getElementById("liberar-plano-vsl");
         var errorMessage = document.getElementById("video-error");
+        var playButton = document.getElementById("play-video");
         var played = false;
         var revealed = false;
         var milestones = new Set();
@@ -90,6 +99,20 @@
           notify("content-revealed", { gate: "liberar-plano-vsl" });
         }
 
+        function startPlayback() {
+          video.muted = false;
+          var attempt = video.play();
+          if (attempt && typeof attempt.catch === "function") {
+            attempt.catch(function () {
+              if (!video.error) playButton.hidden = false;
+            });
+          }
+        }
+
+        playButton.addEventListener("click", startPlayback);
+        video.addEventListener("playing", function () {
+          playButton.hidden = true;
+        });
         video.addEventListener("loadedmetadata", ready);
         video.addEventListener("canplay", ready);
         video.addEventListener("play", function () {
@@ -106,6 +129,7 @@
         });
         video.addEventListener("error", function () {
           errorMessage.hidden = false;
+          playButton.hidden = true;
           notify("error");
         });
         window.addEventListener("pageshow", function () {
@@ -113,6 +137,7 @@
           if (video.ended) revealPlan();
         });
         if (video.readyState >= 1) ready();
+        startPlayback();
       })();
     </script>
   </body>
